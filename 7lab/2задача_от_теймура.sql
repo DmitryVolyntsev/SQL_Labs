@@ -1,0 +1,11 @@
+USE best
+DROP USER testuser
+CREATE USER testuser FOR LOGIN testlog
+GO
+
+GRANT CREATE TABLE TO testuser
+GRANT ALTER ON SCHEMA::dbo TO testuser
+
+EXECUTE AS USER = 'testuser'
+CREATE TABLE NEW (A int)
+REVERT

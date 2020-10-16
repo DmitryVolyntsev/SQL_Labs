@@ -1,0 +1,222 @@
+﻿set DATEFORMAT dmy
+
+/*DROP TABLE FACILITIES;
+DROP TABLE PRICE;
+DROP TABLE ROOM_FACILITIES;
+DROP TABLE DISCOUNT;
+DROP TABLE FOOD;
+DROP TABLE ORDERSS;
+DROP TABLE REVIEW;
+DROP TABLE TRAVELER;
+DROP TABLE ROOM;
+DROP TABLE CLASS;
+DROP TABLE SERVICESS;
+DROP TABLE HOTEL;
+DROP TABLE HOTEL_SERVICES;
+DROP TABLE LOCATION;
+DROP TABLE CITY;
+DROP TABLE LOCATION_TYPE;
+DROP TABLE COUNTRY;*/
+
+CREATE TABLE CLASS (
+	class_id integer IDENTITY(400,1) NOT NULL PRIMARY KEY,
+	name varchar(30) NOT NULL);
+
+
+CREATE TABLE HOTEL (
+	hotel_id integer IDENTITY(100,1) PRIMARY KEY,
+	location_id integer,
+	hotel_name varchar(100) NOT NULL,
+	stars integer NOT NULL,
+	email varchar(320),
+	phone_number varchar(20));
+ALTER TABLE HOTEL ADD CHECK (stars <= 5 and stars >= 1);
+
+
+CREATE TABLE SERVICESS (
+	servicess integer IDENTITY(800,1) NOT NULL PRIMARY KEY,
+	hotel_id integer,
+	service_id integer NOT NULL);
+
+
+CREATE TABLE FACILITIES (
+	facilities integer IDENTITY(700,1) NOT NULL PRIMARY KEY,
+	room_id integer,
+	facility_id integer NOT NULL);
+
+
+CREATE TABLE PRICE (
+	price_id integer IDENTITY(901,1) NOT NULL PRIMARY KEY,
+	discount_id integer NOT NULL,
+	room_id integer,
+	food_id integer NOT NULL,
+	price integer NOT NULL);
+ALTER TABLE PRICE ADD CHECK (price <= 1000 and price >= 1)
+
+
+CREATE TABLE REVIEW (
+	review_id integer IDENTITY(300,1) NOT NULL PRIMARY KEY,
+	traveler_id integer NOT NULL,
+	hotel_id integer,
+	rating integer NOT NULL,
+	comment varchar(300));
+ALTER TABLE REVIEW ADD CHECK (rating <= 5 and rating >= 1)
+
+
+CREATE TABLE LOCATION (
+	location_id integer IDENTITY(36,1) PRIMARY KEY,
+	name varchar(50),
+	city_id integer);
+
+
+CREATE TABLE COUNTRY (
+	country_id integer IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	name varchar(30) NOT NULL);
+
+
+CREATE TABLE LOCATION_TYPE (
+	types_id integer IDENTITY(31,1) NOT NULL PRIMARY KEY,
+	name varchar(30) NOT NULL);
+
+
+CREATE TABLE TRAVELER (
+	traveler_id integer IDENTITY(200,1) NOT NULL PRIMARY KEY,
+	first_name varchar(30) NOT NULL,
+	second_name varchar(30) NOT NULL,
+	birth date NOT NULL,
+	email varchar(320));
+ALTER TABLE TRAVELER ADD CHECK (birth <= '01/01/2017' and birth >= '01/01/0001')
+
+
+CREATE TABLE CITY (
+	city_id integer IDENTITY(9,1) NOT NULL PRIMARY KEY,
+	name varchar(30) NOT NULL,
+	country_id integer NOT NULL,
+	types_id integer NOT NULL);
+
+
+CREATE TABLE ROOM (
+	room_id integer IDENTITY(1000,1) PRIMARY KEY,
+	hotel_id integer,
+	class_id integer NOT NULL);
+
+
+CREATE TABLE ORDERSS (
+	order_id integer IDENTITY(601,1) PRIMARY KEY,
+	traveler_id integer,
+	room_id integer,
+	starts_date datetime NOT NULL,
+	end_date datetime NOT NULL);
+/*ALTER TABLE ORDERSS ADD CHECK (starts_date <= '01/01/2017' and starts_date >= '01/01/2000')
+ALTER TABLE ORDERSS ADD CHECK (end_date <= '01/01/2017' and end_date >= '01/01/2000')*/
+ALTER TABLE ORDERSS ADD CHECK (starts_date <= end_date)
+
+
+CREATE TABLE HOTEL_SERVICES (
+	service_id integer IDENTITY(81,1) NOT NULL PRIMARY KEY,
+	name varchar(50) NOT NULL);
+
+
+CREATE TABLE ROOM_FACILITIES (
+	facility_id integer IDENTITY(90,1) NOT NULL PRIMARY KEY,
+	name varchar(300) NOT NULL);
+
+
+CREATE TABLE DISCOUNT (
+	discount_id integer IDENTITY(500,1) NOT NULL PRIMARY KEY,
+	age_min integer NOT NULL,
+	age_max integer NOT NULL,
+	procent integer NOT NULL);
+ALTER TABLE DISCOUNT ADD CHECK (procent <= 100 and procent >= 0)
+
+
+CREATE TABLE FOOD (
+	food_id integer IDENTITY(95,1) NOT NULL PRIMARY KEY,
+	name varchar(300) NOT NULL);
+
+
+ALTER TABLE CITY ADD
+	FOREIGN KEY (country_id)
+	REFERENCES COUNTRY (country_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (types_id)
+	REFERENCES LOCATION_TYPE (types_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE LOCATION ADD
+	FOREIGN KEY (city_id)
+	REFERENCES CITY (city_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE HOTEL ADD
+	FOREIGN KEY (location_id)
+	REFERENCES LOCATION (location_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE SERVICESS ADD
+	FOREIGN KEY (service_id)
+	REFERENCES HOTEL_SERVICES (service_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (hotel_id)
+	REFERENCES HOTEL (hotel_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE ROOM ADD
+	FOREIGN KEY (hotel_id)
+	REFERENCES HOTEL (hotel_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (class_id)
+	REFERENCES CLASS (class_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE ORDERSS ADD
+	FOREIGN KEY (room_id)
+	REFERENCES ROOM (room_id)
+	ON DELETE SET NULL
+	ON UPDATE CASCADE,
+	FOREIGN KEY (traveler_id)
+	REFERENCES TRAVELER (traveler_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE REVIEW ADD
+	FOREIGN KEY (hotel_id)
+	REFERENCES HOTEL (hotel_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (traveler_id)
+	REFERENCES TRAVELER (traveler_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE FACILITIES ADD
+	FOREIGN KEY (facility_id)
+	REFERENCES ROOM_FACILITIES (facility_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (room_id)
+	REFERENCES ROOM (room_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+
+ALTER TABLE PRICE ADD
+	FOREIGN KEY (room_id)
+	REFERENCES ROOM (room_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (food_id)
+	REFERENCES FOOD (food_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	FOREIGN KEY (discount_id)
+	REFERENCES DISCOUNT (discount_id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE

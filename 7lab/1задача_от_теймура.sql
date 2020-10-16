@@ -1,0 +1,11 @@
+USE best
+
+GRANT SELECT ON HOTEL TO public
+
+DROP USER testuser
+CREATE USER testuser FOR LOGIN testlog
+GO
+
+EXECUTE AS USER = 'testuser'
+SELECT * FROM HOTEL
+REVERT
